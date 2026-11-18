@@ -170,7 +170,7 @@ export class LlmClient {
 
   async generateQuiz({ material, kps, count = 3, reinforceMistakes = [] }) {
     const safeCount = count === 5 ? 5 : 3;
-    const kpListText = kps.map((k, i) => `${i + 1}. ${k.name}${k.desc ? `（${k.desc}）` : ""}`).join("\n");
+    const kpListText = kps.map((k, i) => `${i + 1}. ${k.name}${k.desc ? ` — ${k.desc}` : ""}`).join("\n");
 
     const reinforceBlock = reinforceMistakes.length > 0
       ? [
@@ -186,7 +186,7 @@ export class LlmClient {
       reinforceBlock,
       "核心要求：",
       "1. options 为严格 4 个选项的纯文本数组，不要自带 A./B./C./D. 前缀，只有一个正确答案，answer 为 0~3 的整数下标。",
-      "2. kp 必须对应下方已选知识点名称之一。",
+      "2. kp 必须只填写下方已选知识点的简短名称本身（不超过 15 字，不要带解释说明）。",
       "3. quote 引用学习资料中与本题直接相关的原句或关键公式（不超过 45 字）。",
       "4. 诚实核查：如果用户资料内容较简略，该题需要借助学科通用知识做延伸推导，请在 caution 字段写一句诚实提醒（例如「你的资料仅提及定义，本题结合常见场景延伸推导，建议核对教材」）；若资料原文已充分覆盖，caution 设为 null。",
       "5. steps 为 3~4 条清晰的分步讲解数组。",

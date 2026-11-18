@@ -372,10 +372,14 @@
     return S.chatsByQ[idx];
   }
 
+  function formatRichBubble(str) {
+    return escapeHtml(str).replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
+  }
+
   function renderChat() {
     const msgs = ensureChatForQuestion(S.expIdx);
     const box = $("chatBox");
-    box.innerHTML = msgs.map((m) => `<div class="bubble ${m.role === "user" ? "me" : "ai"}">${escapeHtml(m.content)}</div>`).join("");
+    box.innerHTML = msgs.map((m) => `<div class="bubble ${m.role === "user" ? "me" : "ai"}">${formatRichBubble(m.content)}</div>`).join("");
     box.scrollTop = box.scrollHeight;
   }
 

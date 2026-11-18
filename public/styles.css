@@ -198,16 +198,10 @@ main {
 
 .panel {
   display: none;
-  animation: fade 0.25s ease;
 }
 
 .panel.show {
   display: block;
-}
-
-@keyframes fade {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: none; }
 }
 
 .banner {
@@ -366,6 +360,8 @@ textarea:focus, input[type="text"]:focus {
   padding: 10px 20px;
   font-size: 14px;
   font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: 0.15s;
 }
 
