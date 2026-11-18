@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>知伴 · 让你的资料，变成你的练习</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-wrap">
+      <img class="logo" src="logo.png" alt="知伴">
+      <div class="brand">
+        <h1>知伴</h1>
+        <p>让你的资料，变成你的练习</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <span class="subject-pill" id="subjectPill">未选择课程</span>
+      <button type="button" class="btn ghost sm" id="btnOpenWrongBook">错题本 (<span id="wrongBadge">0</span>)</button>
+    </div>
+  </header>
+
+  <nav class="steps" id="steps" aria-label="学习步骤"></nav>
+
+  <main id="main">
+    <div class="banner error hidden" id="errorBanner" role="alert">
+      <span id="errorMsg"></span>
+      <button type="button" class="banner-close" id="btnCloseError" aria-label="关闭提示">×</button>
+    </div>
+
+    <!-- 第 1 步：交资料 -->
+    <section class="panel show" data-step="0">
+      <div class="card" id="uploadCard">
+        <h2>把你的复习资料交给知伴</h2>
+        <p class="lead">粘贴课堂笔记、知识点提纲，或直接上传课件文件，知伴会围绕你的内容梳理考点、出题并持续陪伴复习。</p>
+
+        <div class="sample-row">
+          <span class="sample-label">快速体验：</span>
+          <button type="button" class="chip" data-sample="calculus">填入示例：高等数学 · 导数</button>
+          <button type="button" class="chip" data-sample="ds">填入示例：数据结构 · 栈与队列</button>
+          <button type="button" class="chip" data-sample="net">填入示例：计算机网络 · TCP 连接</button>
+        </div>
+
+        <textarea id="materialInput" rows="8" placeholder="在这里粘贴你的课堂笔记、复习要点或课本段落（支持任意学科，建议 30～10000 字）…"></textarea>
+        <div class="meta-bar">
+          <span id="charCount">0 / 10000 字</span>
+          <span class="file-chip hidden" id="fileChip"><span id="fileName"></span> · 已提取正文</span>
+        </div>
+
+        <div class="row action-row">
+          <input type="file" id="fileInput" accept=".txt,.md,.markdown,.pdf,.docx,.pptx" hidden>
+          <button type="button" class="btn ghost" id="btnUpload">＋ 上传课件（PDF / PPTX / Word / TXT）</button>
+          <button type="button" class="btn primary right-push" id="btnOrganize">开始整理 →</button>
+        </div>
+      </div>
+
+      <div class="card loading hidden" id="step0Loading">
+        <div class="spinner"></div>
+        <div class="loading-title" id="step0LoadingText">正在梳理你的资料知识点…</div>
+        <p class="loading-sub">知伴正在通读资料结构并提炼核心考点</p>
+      </div>
+    </section>
+
+    <!-- 第 2 步：确认范围 -->
+    <section class="panel" data-step="1">
+      <div class="card" id="scopeCard">
+        <h2>从你的资料里整理出 <span class="hl" id="kpCount">0</span> 个知识点</h2>
+        <p class="lead">勾选这次想练的范围，题目只会围绕你选中的知识点与资料内容生成。</p>
+        <div class="tags" id="tags"></div>
+
+        <div class="count-row">
+          <span class="sample-label">本轮题量：</span>
+          <button type="button" class="chip active" data-qcount="3">3 道精炼题</button>
+          <button type="button" class="chip" data-qcount="5">5 道综合题</button>
+        </div>
+
+        <div class="row action-row">
+          <span class="muted" id="selInfo">已选 0 个知识点</span>
+          <button type="button" class="btn primary right-push" id="btnGen">生成练习 →</button>
+        </div>
+      </div>
+
+      <div class="card loading hidden" id="step1Loading">
+        <div class="spinner"></div>
+        <div class="loading-title">正在围绕选定范围出题并核对资料依据…</div>
+        <p class="loading-sub">每道题都会附上资料出处；若资料覆盖不足，知伴会如实标出提醒</p>
+      </div>
+    </section>
+
+    <!-- 第 3 步：出题 -->
+    <section class="panel" data-step="2">
+      <div class="section-head">
+        <div>
+          <h2 id="previewHeading">为你生成了 3 道练习题</h2>
+          <p class="lead" style="margin-bottom:0">每道题都标明出自你资料的哪一部分，可先核对依据再动手作答。</p>
+        </div>
+        <button type="button" class="btn primary" id="btnStart">开始作答 →</button>
+      </div>
+      <div id="previewList"></div>
+    </section>
+
+    <!-- 第 4 步：作答 -->
+    <section class="panel" data-step="3">
+      <div class="score hidden" id="scoreBox"></div>
+      <div id="answerList"></div>
+      <div class="row action-row">
+        <span class="muted" id="answerHint">点选你认为正确的选项，选完后提交。</span>
+        <button type="button" class="btn primary right-push" id="btnSubmit">提交答案</button>
+      </div>
+    </section>
+
+    <!-- 第 5 步：讲解与追问 -->
+    <section class="panel" data-step="4">
+      <div class="two-col">
+        <div class="card">
+          <h2>一步一步，弄懂它</h2>
+          <div class="exp-tabs" id="expTabs"></div>
+          <div id="expBody"></div>
+        </div>
+        <div class="card chat-card">
+          <h2>还有哪里不明白？随时追问</h2>
+          <div class="chat" id="chatBox"></div>
+          <div class="quick" id="quickChips"></div>
+          <div class="ask-row">
+            <input type="text" id="askInput" placeholder="输入你的疑问，比如“这里为什么选这个？”…">
+            <button type="button" class="btn primary" id="btnAsk">发送</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第 6 步：薄弱点与下一轮 -->
+    <section class="panel" data-step="5">
+      <div class="grid3" id="reviewGrid">
+        <div class="card">
+          <div class="mini-title"><span class="ic">错</span>错题本</div>
+          <div id="wrongBook"></div>
+        </div>
+        <div class="card">
+          <div class="mini-title"><span class="ic">析</span>知识点掌握情况</div>
+          <div id="masteryBox"></div>
+        </div>
+        <div class="card">
+          <div class="mini-title"><span class="ic">练</span>下一轮安排</div>
+          <div class="remind">
+            <div class="remind-eyebrow">知伴学习建议</div>
+            <div class="remind-big" id="remindBig">准备就绪</div>
+          </div>
+          <p class="muted small" id="remindNote"></p>
+          <button type="button" class="btn primary full" id="btnReinforce">针对薄弱点再练 3 道同类题 →</button>
+        </div>
+      </div>
+
+      <div class="card loading hidden" id="step5Loading">
+        <div class="spinner"></div>
+        <div class="loading-title">正在针对你的薄弱知识点生成全新变式练习题…</div>
+        <p class="loading-sub">换个问法再练一次，确认真正掌握</p>
+      </div>
+
+      <div class="next-sub">
+        <p class="muted">同样的方法，也能用在你的其他课程上</p>
+        <button type="button" class="btn ghost" id="btnSwitchCourse">↻ 换一门课或提交新资料</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span class="footer-note">知伴 · 资料驱动的跨学科刷题陪伴助手</span>
+    <div class="nav-btns">
+      <button type="button" class="btn ghost" id="btnPrev">← 上一步</button>
+      <button type="button" class="btn primary" id="btnNext">下一步 →</button>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
